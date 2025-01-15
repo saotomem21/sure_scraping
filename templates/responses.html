@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraping Results</title>
+</head>
+<body>
+    <h1>Scraping Results</h1>
+    <div id="results">
+        {% if error %}
+            <p style="color: red;">{{ status_message }}</p>
+        {% else %}
+            <ol>
+            {% for response in responses %}
+                <li>{{ response }}</li>
+            {% endfor %}
+            </ol>
+            <p><a href="/download?file_id={{ file_id }}">Download as CSV</a></p>
+        {% endif %}
+    </div>
+    <a href="/">Back to Home</a>
+</body>
+</html>
