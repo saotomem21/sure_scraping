@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scraping Results</title>
+    <style>
+        .result-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .url-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .responses-list {
+            margin-left: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Scraping Results</h1>
@@ -11,11 +27,16 @@
         {% if error %}
             <p style="color: red;">{{ status_message }}</p>
         {% else %}
-            <ol>
-            {% for response in responses %}
-                <li>{{ response }}</li>
+            {% for url_data in responses %}
+                <div class="result-section">
+                    <div class="url-header">URL: {{ url_data.url }}</div>
+                    <ol class="responses-list">
+                    {% for response in url_data.responses %}
+                        <li>{{ response }}</li>
+                    {% endfor %}
+                    </ol>
+                </div>
             {% endfor %}
-            </ol>
             <p><a href="/download?file_id={{ file_id }}">Download as CSV</a></p>
         {% endif %}
     </div>

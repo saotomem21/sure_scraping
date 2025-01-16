@@ -4,13 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Scraping App</title>
+    <style>
+        .url-input-group {
+            margin-bottom: 10px;
+        }
+        .url-input-group input {
+            width: 300px;
+        }
+        .add-url-btn, .remove-url-btn {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <h1>Web Scraping App</h1>
-    <form action="/process" method="POST">
-        <label for="url">URL:</label>
-        <input type="text" id="url" name="target_url" required>
+    <form action="/process" method="POST" id="scrape-form">
+        <div id="url-inputs">
+            <div class="url-input-group">
+                <input type="text" name="target_urls[]" placeholder="Enter URL" required>
+                <span class="add-url-btn" onclick="addUrlInput()">➕</span>
+            </div>
+        </div>
         <button type="submit">Scrape</button>
     </form>
+
+    <script>
+        function addUrlInput() {
+            const container = document.getElementById('url-inputs');
+            const newInputGroup = document.createElement('div');
+            newInputGroup.className = 'url-input-group';
+            newInputGroup.innerHTML = `
+                <input type="text" name="target_urls[]" placeholder="Enter URL" required>
+                <span class="remove-url-btn" onclick="this.parentElement.remove()">➖</span>
+            `;
+            container.appendChild(newInputGroup);
+        }
+    </script>
 </body>
 </html>

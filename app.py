@@ -83,16 +83,26 @@ def index():
 
 @app.route('/process', methods=['POST'])
 def process():
-    url = request.form.get('target_url')
-    if not url:
+    urls = request.form.getlist('target_urls[]')
+    if not urls:
         return render_template('responses.html', error=True, status_message='URLが入力されていません')
     
-    logger.info(f"Processing URL: {url}")
-    responses = scrape_responses(url)
+    all_responses = []
+    for url in urls:
+        logger.info(f"Processing URL: {url}")
+        responses = scrape_responses(url)
+        
+        if responses is None:
+            logger.warning(f"No responses found for URL: {url}")
+            continue
+            
+        all_responses.append({
+            'url': url,
+            'responses': responses
+        })
     
-    if responses is None:
-        logger.warning("No responses found")
-        return render_template('responses.html', error=True, status_message="レスが見つかりませんでした")
+    if not all_responses:
+        return render_template('responses.html', error=True, status_message="どのURLからもレスが見つかりませんでした")
     
     # Store responses in temporary file
     file_id = str(uuid.uuid4())
@@ -102,15 +112,16 @@ def process():
     # Write responses to CSV file
     with open(temp_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow(["レス番号", "内容"])
-        for i, res in enumerate(responses, 1):
-            writer.writerow([i, res])
+        writer.writerow(["URL", "レス番号", "内容"])
+        for url_data in all_responses:
+            for i, res in enumerate(url_data['responses'], 1):
+                writer.writerow([url_data['url'], i, res])
     
-    logger.info(f"Successfully wrote {len(responses)} responses to CSV")
+    logger.info(f"Successfully wrote {sum(len(url_data['responses']) for url_data in all_responses)} responses to CSV")
     response_files[file_id] = temp_path
     logger.debug(f"Stored file reference with ID: {file_id}")
     
-    return render_template('responses.html', responses=responses, file_id=file_id)
+    return render_template('responses.html', responses=all_responses, file_id=file_id)
 
 @app.route('/download')
 def download():
